@@ -13,14 +13,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-app:#f3f4f6; --bg-card:#ffffff; --bg-card-2:#f4f4f5;
+    --bg-app:#eef8ea; --bg-card:#ffffff; --bg-card-2:#f2f7ef;
     --text-1:#111111; --text-2:#6b7280; --border-c:rgba(0,0,0,.08);
     --input-bg:#ffffff;
+    --accent:#65a30d; --accent-2:#4d7c0f;
+    --sidebar-bg:#1b1d1b; --sidebar-text:rgba(255,255,255,.62); --sidebar-text-active:#ffffff;
   }
   html.dark{
     --bg-app:#111111; --bg-card:#181818; --bg-card-2:#1f1f1f;
     --text-1:#ffffff; --text-2:rgba(255,255,255,.55); --border-c:rgba(255,255,255,.08);
     --input-bg:#111111;
+    --accent:#84cc16; --accent-2:#65a30d;
   }
   *{font-family:'Inter','Noto Sans Thai',sans-serif;}
   body{background:var(--bg-app);color:var(--text-1);transition:background .2s,color .2s;}
@@ -29,11 +32,19 @@
   .text-muted{color:var(--text-2);}
   .input-f{background:var(--input-bg);border:1px solid var(--border-c);color:var(--text-1);}
   .input-f::placeholder{color:var(--text-2);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-accent:hover{background:var(--accent-2);}
   .grad-WHART{background:linear-gradient(135deg,#8b5cf6,#3b82f6);}
   .grad-WHAIR{background:linear-gradient(135deg,#ec4899,#fb923c);}
   .grad-PROSPECT{background:linear-gradient(135deg,#a3e635,#38bdf8);}
+  .sidebar{background:var(--sidebar-bg);}
+  .side-link{color:var(--sidebar-text);}
+  .side-link.active{background:var(--accent);color:#fff;}
+  .side-link:hover{color:#fff;background:rgba(255,255,255,.06);}
+  .side-btn{background:rgba(255,255,255,.08);color:var(--sidebar-text);}
+  .side-btn:hover{color:#fff;}
   .nav-link{color:var(--text-2);}
-  .nav-link.active{background:rgba(120,120,255,.12);color:var(--text-1);}
+  .nav-link.active{background:var(--accent);color:#fff;}
   .nav-link:hover{color:var(--text-1);}
   .fade-in{animation:fadeIn .18s ease-out;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -47,34 +58,59 @@
 </head>
 <body>
 
-<div class="flex min-h-screen">
+<!-- หน้าจอ Login/Signup จะโผล่มาแสดงตรงนี้ -->
+<div id="auth-root"></div>
+
+<div id="app-root" class="flex min-h-screen hidden">
   <!-- Sidebar (desktop) -->
-  <aside class="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 card p-6 z-30">
-    <div class="flex items-center gap-2 mb-8">
-      <div class="h-9 w-9 rounded-lg grad-WHART flex items-center justify-center shrink-0">
+  <aside class="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 sidebar p-6 z-30">
+    <div class="flex items-center gap-2 mb-6">
+      <div class="h-9 w-9 rounded-lg btn-accent flex items-center justify-center shrink-0">
         <i data-lucide="book-text" class="w-4 h-4 text-white"></i>
       </div>
-      <span class="font-bold text-lg">REIT Journal</span>
+      <span class="font-bold text-lg text-white">REIT Journal</span>
     </div>
+
+    <div class="flex items-center gap-3 mb-6 p-3 rounded-2xl" style="background:rgba(255,255,255,.06)">
+      <div class="relative shrink-0">
+        <img id="sidebar-avatar" src="" class="h-11 w-11 rounded-full object-cover border-2" style="border-color:var(--accent)"/>
+        <button id="avatar-edit-btn" type="button" class="absolute -bottom-1 -right-1 h-5 w-5 rounded-full btn-accent flex items-center justify-center border-2" style="border-color:var(--sidebar-bg)">
+          <i data-lucide="camera" class="w-[10px] h-[10px] text-white"></i>
+        </button>
+        <input id="avatar-input" type="file" accept="image/*" class="hidden"/>
+      </div>
+      <div class="min-w-0">
+        <p id="sidebar-username" class="text-sm font-semibold text-white truncate">-</p>
+        <button id="logout-btn" type="button" class="text-xs" style="color:var(--sidebar-text)">ออกจากระบบ</button>
+      </div>
+    </div>
+
     <nav class="space-y-1">
-      <a href="#/" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition" data-nav="dashboard">
+      <a href="#/" class="side-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition" data-nav="dashboard">
         <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i> Dashboard
       </a>
     </nav>
-    <p class="px-3 text-xs uppercase tracking-wide text-muted mt-6 mb-2">หุ้นที่ติดตาม</p>
+    <p class="px-3 text-xs uppercase tracking-wide mt-6 mb-2" style="color:var(--sidebar-text)">หุ้นที่ติดตาม</p>
     <div class="space-y-1">
-      <a href="#/stock/WHART" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-WHART"><i data-lucide="trending-up" class="w-4 h-4"></i> WHART</a>
-      <a href="#/stock/WHAIR" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-WHAIR"><i data-lucide="trending-up" class="w-4 h-4"></i> WHAIR</a>
-      <a href="#/stock/PROSPECT" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-PROSPECT"><i data-lucide="trending-up" class="w-4 h-4"></i> PROSPECT</a>
+      <a href="#/stock/WHART" class="side-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-WHART"><i data-lucide="trending-up" class="w-4 h-4"></i> WHART</a>
+      <a href="#/stock/WHAIR" class="side-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-WHAIR"><i data-lucide="trending-up" class="w-4 h-4"></i> WHAIR</a>
+      <a href="#/stock/PROSPECT" class="side-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition" data-nav="stock-PROSPECT"><i data-lucide="trending-up" class="w-4 h-4"></i> PROSPECT</a>
     </div>
     <div class="mt-auto pt-6">
-      <button id="theme-toggle" class="w-full flex items-center justify-center gap-2 card-2 rounded-xl py-2.5 text-sm font-medium">
+      <button id="theme-toggle" class="w-full flex items-center justify-center gap-2 side-btn rounded-xl py-2.5 text-sm font-medium">
         <i data-lucide="moon" class="w-4 h-4" id="theme-icon"></i> <span id="theme-label">โหมดสว่าง</span>
       </button>
     </div>
   </aside>
 
   <main class="flex-1 lg:ml-64 pb-24 lg:pb-10">
+    <div class="lg:hidden flex items-center justify-between p-4 border-b card">
+      <span class="font-bold">REIT Journal</span>
+      <div class="flex items-center gap-2.5">
+        <img id="sidebar-avatar-m" src="" class="h-8 w-8 rounded-full object-cover"/>
+        <button id="logout-btn-m" type="button" class="text-xs text-muted">ออก</button>
+      </div>
+    </div>
     <div class="max-w-7xl mx-auto p-4 md:p-8" id="app">
       <p class="text-muted text-sm">กำลังโหลด...</p>
     </div>
@@ -82,7 +118,7 @@
 </div>
 
 <!-- Mobile bottom nav -->
-<nav class="lg:hidden fixed bottom-0 inset-x-0 card flex items-center justify-around py-2 z-40">
+<nav id="mobile-nav" class="lg:hidden fixed bottom-0 inset-x-0 card hidden items-center justify-around py-2 z-40">
   <a href="#/" class="nav-link flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg text-[11px]" data-nav="dashboard"><i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i>Dashboard</a>
   <a href="#/stock/WHART" class="nav-link flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg text-[11px]" data-nav="stock-WHART"><i data-lucide="trending-up" class="w-[18px] h-[18px]"></i>WHART</a>
   <a href="#/stock/WHAIR" class="nav-link flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg text-[11px]" data-nav="stock-WHAIR"><i data-lucide="trending-up" class="w-[18px] h-[18px]"></i>WHAIR</a>
@@ -96,10 +132,11 @@
 <div id="toast-root" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 items-center"></div>
 
 <script>
-/* ============ CONFIG: แก้ 2 ค่านี้เป็นของคุณ ============ */
-const SUPABASE_URL = "https://bnjjzepzwcagsdecpovl.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_9Zsx9XgwhzuYMcgxjt8MzA_lHa81iim";
+/* ============ CONFIG: แก้ 3 ค่านี้เป็นของคุณ ============ */
+const SUPABASE_URL = "https://bnjjzepzwcagsdecpovl.supabase.co"; 
+const SUPABASE_ANON_KEY = "sb_publishable_9Zsx9XgwhzuYMcgxjt8MzA_lHa81iim;
 const BUCKET = "journal-images";
+const BUCKET_AVATARS = "avatars";
 /* ======================================================== */
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -108,6 +145,8 @@ const appEl = document.getElementById('app');
 const GRAD_CLASS = { WHART:'grad-WHART', WHAIR:'grad-WHAIR', PROSPECT:'grad-PROSPECT' };
 
 let state = { stocks: [], dashboardPage: 1, stockPage: 1 };
+let currentUser = null;
+let currentProfile = null;
 const PAGE_SIZE_DASH = 6;
 const PAGE_SIZE_STOCK = 8;
 
@@ -136,12 +175,182 @@ function paginate(arr, page, size){
 function showToast(msg, type='success'){
   const el = document.createElement('div');
   el.className = 'toast card px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg flex items-center gap-2';
-  el.innerHTML = `<i data-lucide="${type==='success'?'check-circle-2':'alert-circle'}" class="w-4 h-4 ${type==='success'?'text-emerald-400':'text-red-400'}"></i>${escapeHtml(msg)}`;
+  el.innerHTML = `<i data-lucide="${type==='success'?'check-circle-2':'alert-circle'}" class="w-4 h-4 ${type==='success'?'text-emerald-500':'text-red-400'}"></i>${escapeHtml(msg)}`;
   document.getElementById('toast-root').appendChild(el);
   lucide.createIcons();
   setTimeout(()=>el.remove(), 3000);
 }
 function icons(){ lucide.createIcons(); }
+
+/* ---------- AUTH ---------- */
+async function fetchProfile(userId){
+  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if(error) throw error;
+  return data;
+}
+async function upsertProfile(userId, payload){
+  const { error } = await sb.from('profiles').upsert({ id:userId, ...payload, updated_at: new Date().toISOString() });
+  if(error) throw error;
+}
+async function uploadAvatar(file, userId){
+  const ext = file.name.split('.').pop();
+  const path = `${userId}/avatar.${ext}`;
+  const { error } = await sb.storage.from(BUCKET_AVATARS).upload(path, file, { upsert: true });
+  if(error) throw error;
+  const { data } = sb.storage.from(BUCKET_AVATARS).getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
+
+function showAppScreens(){
+  document.getElementById('auth-root').innerHTML = '';
+  document.getElementById('app-root').classList.remove('hidden');
+  document.getElementById('mobile-nav').classList.remove('hidden');
+  document.getElementById('mobile-nav').classList.add('flex');
+}
+function hideAppScreens(){
+  document.getElementById('app-root').classList.add('hidden');
+  document.getElementById('mobile-nav').classList.add('hidden');
+  document.getElementById('mobile-nav').classList.remove('flex');
+}
+
+async function initAuth(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){
+    currentUser = session.user;
+    await loadProfileAndShowApp();
+  } else {
+    renderAuthForm();
+  }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_IN' && session){
+      currentUser = session.user;
+      await loadProfileAndShowApp();
+    } else if(event === 'SIGNED_OUT'){
+      currentUser = null; currentProfile = null;
+      hideAppScreens();
+      renderAuthForm();
+    }
+  });
+}
+
+async function loadProfileAndShowApp(){
+  try{ currentProfile = await fetchProfile(currentUser.id); }
+  catch(e){ console.error(e); }
+  showAppScreens();
+  renderProfileBox();
+  initTheme();
+  router();
+}
+
+function renderProfileBox(){
+  const name = currentProfile?.full_name || currentUser.email.split('@')[0];
+  const avatar = currentProfile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=65a30d`;
+  const uEl = document.getElementById('sidebar-username');
+  const aEl = document.getElementById('sidebar-avatar');
+  const amEl = document.getElementById('sidebar-avatar-m');
+  if(uEl) uEl.textContent = name;
+  if(aEl) aEl.src = avatar;
+  if(amEl) amEl.src = avatar;
+}
+
+function renderAuthForm(){
+  document.getElementById('auth-root').innerHTML = `
+    <div class="min-h-screen flex items-center justify-center p-4" style="background:linear-gradient(160deg,#eafbe0,#bfe89a);">
+      <div class="w-full max-w-sm card rounded-3xl p-8">
+        <div class="flex items-center gap-2 mb-6 justify-center">
+          <div class="h-10 w-10 rounded-xl btn-accent flex items-center justify-center"><i data-lucide="book-text" class="w-5 h-5 text-white"></i></div>
+          <span class="font-bold text-xl">REIT Journal</span>
+        </div>
+        <div class="flex card-2 rounded-xl p-1 mb-6">
+          <button type="button" id="tab-login" class="flex-1 py-2 rounded-lg text-sm font-medium">เข้าสู่ระบบ</button>
+          <button type="button" id="tab-signup" class="flex-1 py-2 rounded-lg text-sm font-medium text-muted">สมัครสมาชิก</button>
+        </div>
+        <form id="auth-form" class="space-y-3">
+          <div id="signup-name-wrap" class="hidden">
+            <label class="text-xs text-muted block mb-1.5">ชื่อของคุณ</label>
+            <input id="a-name" class="w-full input-f rounded-xl px-3 py-2.5 text-sm" placeholder="ชื่อ-นามสกุล"/>
+          </div>
+          <div>
+            <label class="text-xs text-muted block mb-1.5">อีเมล</label>
+            <input id="a-email" type="email" required class="w-full input-f rounded-xl px-3 py-2.5 text-sm" placeholder="you@email.com"/>
+          </div>
+          <div>
+            <label class="text-xs text-muted block mb-1.5">รหัสผ่าน</label>
+            <input id="a-password" type="password" required minlength="6" class="w-full input-f rounded-xl px-3 py-2.5 text-sm" placeholder="อย่างน้อย 6 ตัวอักษร"/>
+          </div>
+          <button id="auth-submit" type="submit" class="w-full btn-accent rounded-xl py-2.5 text-sm font-semibold mt-2">เข้าสู่ระบบ</button>
+        </form>
+      </div>
+    </div>`;
+
+  let mode = 'login';
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const nameWrap = document.getElementById('signup-name-wrap');
+  const submitBtn = document.getElementById('auth-submit');
+  function setMode(m){
+    mode = m;
+    tabLogin.classList.toggle('btn-accent', m==='login');
+    tabLogin.classList.toggle('text-muted', m!=='login');
+    tabSignup.classList.toggle('btn-accent', m==='signup');
+    tabSignup.classList.toggle('text-muted', m!=='signup');
+    nameWrap.classList.toggle('hidden', m!=='signup');
+    submitBtn.textContent = m==='login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  }
+  tabLogin.addEventListener('click', ()=>setMode('login'));
+  tabSignup.addEventListener('click', ()=>setMode('signup'));
+  setMode('login');
+
+  document.getElementById('auth-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('a-email').value.trim();
+    const password = document.getElementById('a-password').value;
+    submitBtn.disabled = true; submitBtn.textContent = 'กำลังดำเนินการ...';
+    try{
+      if(mode === 'login'){
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+      } else {
+        const name = document.getElementById('a-name').value.trim();
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if(error) throw error;
+        if(data.user){ await upsertProfile(data.user.id, { full_name: name || email.split('@')[0] }); }
+        if(!data.session){
+          showToast('สมัครสำเร็จ กรุณาเข้าสู่ระบบ');
+          setMode('login');
+          submitBtn.disabled = false;
+          return;
+        }
+      }
+    }catch(err){
+      console.error(err);
+      showToast(err.message || 'เกิดข้อผิดพลาด', 'error');
+      submitBtn.disabled = false; setMode(mode);
+    }
+  });
+  icons();
+}
+
+function initSidebarEvents(){
+  document.getElementById('avatar-edit-btn').addEventListener('click', ()=> document.getElementById('avatar-input').click());
+  document.getElementById('avatar-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      showToast('กำลังอัปโหลดรูปโปรไฟล์...');
+      const url = await uploadAvatar(file, currentUser.id);
+      await upsertProfile(currentUser.id, { avatar_url: url });
+      currentProfile = { ...(currentProfile||{}), avatar_url: url };
+      renderProfileBox();
+      showToast('เปลี่ยนรูปโปรไฟล์เรียบร้อยแล้ว');
+    }catch(err){
+      console.error(err);
+      showToast('อัปโหลดรูปไม่สำเร็จ','error');
+    }
+  });
+  document.getElementById('logout-btn').addEventListener('click', () => sb.auth.signOut());
+  document.getElementById('logout-btn-m').addEventListener('click', () => sb.auth.signOut());
+}
 
 /* ---------- Data Layer ---------- */
 async function fetchStocks(){
@@ -211,7 +420,7 @@ async function deleteImageRow(id, storagePath){
 
 /* ---------- Theme ---------- */
 function initTheme(){
-  const saved = localStorage.getItem('theme') || 'dark';
+  const saved = localStorage.getItem('theme') || 'light';
   document.documentElement.classList.toggle('dark', saved === 'dark');
   updateThemeLabel();
 }
@@ -237,8 +446,8 @@ function highlightNav(key){
 }
 
 /* ---------- Router ---------- */
-window.addEventListener('hashchange', router);
-window.addEventListener('DOMContentLoaded', () => { initTheme(); router(); });
+window.addEventListener('hashchange', () => { if(currentUser) router(); });
+window.addEventListener('DOMContentLoaded', () => { initSidebarEvents(); initAuth(); });
 
 async function router(){
   const hash = location.hash || '#/';
@@ -312,7 +521,7 @@ async function renderDashboardPage(){
       <div class="flex items-center gap-2">
         <button onclick="exportCSVAll()" class="flex items-center gap-1.5 card-2 px-3.5 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="file-down" class="w-4 h-4"></i>CSV</button>
         <button onclick="exportPDF(null)" class="flex items-center gap-1.5 card-2 px-3.5 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="printer" class="w-4 h-4"></i>PDF</button>
-        <button onclick="openCreateModal(null)" class="flex items-center gap-2 grad-WHART text-white px-4 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>เพิ่มบันทึกวันนี้</button>
+        <button onclick="openCreateModal(null)" class="flex items-center gap-2 btn-accent px-4 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>เพิ่มบันทึกวันนี้</button>
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">${cardsHtml}</div>
@@ -347,7 +556,7 @@ function renderStockBody(stock, entries){
       <div class="flex items-center gap-2">
         <button onclick="exportCSVStock('${stock.id}','${stock.symbol}')" class="flex items-center gap-1.5 card-2 px-3.5 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="file-down" class="w-4 h-4"></i>CSV</button>
         <button onclick="exportPDF('${stock.id}')" class="flex items-center gap-1.5 card-2 px-3.5 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="printer" class="w-4 h-4"></i>PDF</button>
-        <button onclick="openCreateModal('${stock.id}')" class="flex items-center gap-2 bg-white text-black px-4 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>เพิ่มบันทึก</button>
+        <button onclick="openCreateModal('${stock.id}')" class="flex items-center gap-2 btn-accent px-4 py-2.5 rounded-xl text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>เพิ่มบันทึก</button>
       </div>
     </div>
     <h2 class="text-lg font-semibold mb-4">บันทึกทั้งหมด</h2>
@@ -415,7 +624,7 @@ async function renderEntryPage(id){
         </div>
         <div class="flex items-center gap-2">
           <button onclick='openEditModal(${JSON.stringify(entry.id)})' class="flex items-center gap-1.5 card-2 px-3 py-2 rounded-xl text-sm"><i data-lucide="pencil" class="w-[14px] h-[14px]"></i>แก้ไข</button>
-          <button onclick="openDeleteConfirm('${entry.id}','${symbol}')" class="flex items-center gap-1.5 bg-red-500/10 text-red-400 px-3 py-2 rounded-xl text-sm"><i data-lucide="trash-2" class="w-[14px] h-[14px]"></i>ลบ</button>
+          <button onclick="openDeleteConfirm('${entry.id}','${symbol}')" class="flex items-center gap-1.5 bg-red-500/10 text-red-500 px-3 py-2 rounded-xl text-sm"><i data-lucide="trash-2" class="w-[14px] h-[14px]"></i>ลบ</button>
         </div>
       </div>
       <p class="text-muted leading-relaxed whitespace-pre-wrap mt-4">${escapeHtml(entry.content || '')}</p>
@@ -545,11 +754,11 @@ function renderModal(){
           <div>
             <label class="text-xs text-muted block mb-1.5">รูปภาพประกอบ</label>
             <p class="text-[11px] text-muted mb-2">รองรับไฟล์ JPG, PNG และ WEBP สามารถเลือกได้หลายรูป</p>
-            <input id="f-files" type="file" accept="image/jpeg,image/png,image/webp" multiple class="text-xs text-muted file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-white/10 file:text-current file:text-xs"/>
+            <input id="f-files" type="file" accept="image/jpeg,image/png,image/webp" multiple class="text-xs text-muted file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-black/10 file:text-current file:text-xs"/>
             ${(existingImgsHtml || newFilesHtml) ? `<div class="grid grid-cols-4 gap-2 mt-3">${existingImgsHtml}${newFilesHtml}</div>` : ''}
           </div>
           <div class="flex items-center gap-3 pt-2">
-            <button type="submit" id="f-submit" class="flex-1 bg-white text-black rounded-xl py-2.5 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60">
+            <button type="submit" id="f-submit" class="flex-1 btn-accent rounded-xl py-2.5 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60">
               ${m.loading ? '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>' : ''} บันทึกข้อมูล
             </button>
             <button type="button" onclick="closeModal()" class="flex-1 card-2 rounded-xl py-2.5 text-sm font-medium">ยกเลิก</button>
